@@ -40,7 +40,7 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': CLAUDE_API_KEY,
-        'anthropic-version': '2024-01-01'
+        'anthropic-version': '2023-06-01'  // Updated to use the correct version
       },
       body: JSON.stringify({
         model: 'claude-3-opus-20240229',
@@ -99,7 +99,7 @@ serve(async (req) => {
         details: error.toString()
       }),
       { 
-        status: 500, // Changed from 400 to 500 for server errors
+        status: 500,
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'
