@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 interface GenerateTemplateResponse {
   template: string;
@@ -26,7 +25,6 @@ export const generateEmailTemplate = async (imageBase64: string): Promise<string
     return data.template;
   } catch (error: any) {
     console.error('Error generating template:', error);
-    toast.error(error.message || 'Failed to generate template');
     throw error;
   }
 };

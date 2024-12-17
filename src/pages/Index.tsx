@@ -62,7 +62,7 @@ const Index = () => {
           const base64Image = e.target.result as string;
           
           try {
-            const template = await generateEmailTemplate(base64Image, savedKey);
+            const template = await generateEmailTemplate(base64Image);
             setHtml(template);
             toast.success('Template generated successfully');
           } catch (error) {
