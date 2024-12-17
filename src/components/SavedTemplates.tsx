@@ -70,7 +70,7 @@ const SavedTemplates = ({ onOpenTemplate }: SavedTemplatesProps) => {
         <div className="p-4 border-b">
           <h2 className="text-lg font-semibold">Saved Templates</h2>
         </div>
-        <ScrollArea className="h-[300px]">
+        <ScrollArea className="h-[400px]">
           <div className="p-4 space-y-4">
             {templates.map((template, index) => (
               <div 
