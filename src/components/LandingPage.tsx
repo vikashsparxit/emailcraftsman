@@ -3,14 +3,17 @@ import FileUpload from './FileUpload';
 import { UserNav } from './UserNav';
 import { Button } from './ui/button';
 import { Key } from 'lucide-react';
+import { Template } from '@/utils/indexDB';
 
 interface LandingPageProps {
   onFileUpload: (file: File) => void;
   onOpenSettings: () => void;
-  onOpenTemplate?: (html: string) => void;
+  onOpenTemplate?: (template: Template) => void;
 }
 
 const LandingPage = ({ onFileUpload, onOpenSettings, onOpenTemplate }: LandingPageProps) => {
+  console.log('LandingPage rendering with onOpenTemplate:', !!onOpenTemplate);
+  
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-12">

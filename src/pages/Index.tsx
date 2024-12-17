@@ -27,6 +27,7 @@ const Index = () => {
   } = useTemplateGeneration();
 
   const handleFileUpload = async (file: File) => {
+    console.log('Handling file upload:', file.name);
     setShowEditor(false);
     const success = await generateTemplate(file);
     if (success) {
@@ -35,6 +36,7 @@ const Index = () => {
   };
 
   const handleExport = () => {
+    console.log('Exporting template...');
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -48,6 +50,7 @@ const Index = () => {
   };
 
   const handleApiKeySave = async () => {
+    console.log('Saving API key...');
     try {
       await saveApiKey(apiKey);
       toast.success('API key saved successfully');
@@ -73,7 +76,7 @@ const Index = () => {
   };
 
   const handleOpenTemplate = (template: Template) => {
-    console.log('Index: Opening template in editor:', {
+    console.log('Opening template:', {
       htmlLength: template.html.length,
       notesLength: template.notes?.length
     });
