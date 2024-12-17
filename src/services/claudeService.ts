@@ -19,8 +19,8 @@ export const generateEmailTemplate = async (imageBase64: string, apiKey: string)
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'anthropic-version': '2024-01-01',
         'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
         model: 'claude-3-opus-20240229',
@@ -47,14 +47,38 @@ export const generateEmailTemplate = async (imageBase64: string, apiKey: string)
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Claude API error:', errorData);
+      
+      if (response.status === 401) {
+        toast.error('Invalid API key. Please check your Claude API key in settings.');
+        throw new Error('Invalid API key');
+      }
+      
+      if (response.status === 429) {
+        toast.error('Rate limit exceeded. Please try again later.');
+        throw new Error('Rate limit exceeded');
+      }
+
       throw new Error(errorData.error?.message || 'Failed to generate template');
     }
 
     const data: GenerateTemplateResponse = await response.json();
+    
+    if (!data.content?.[0]?.text) {
+      throw new Error('Invalid response format from Claude API');
+    }
+
     console.log('Template generated successfully');
     return data.content[0].text;
   } catch (error) {
     console.error('Error generating template:', error);
+    
+    // Check if it's a network error (CORS or connection issues)
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      toast.error('Network error. Please check your internet connection and try again.');
+      throw new Error('Network error while connecting to Claude API');
+    }
+
     throw error;
   }
 };
