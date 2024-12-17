@@ -17,31 +17,36 @@ const PromptEditor = ({ open, onOpenChange }: PromptEditorProps) => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const fetchPrompt = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('admin_settings')
-          .select('setting_value')
-          .eq('setting_key', 'email_template_prompt')
-          .single();
-
-        if (error) throw error;
-        if (data) {
-          setPrompt(data.setting_value);
-        }
-      } catch (error) {
-        console.error('Error fetching prompt:', error);
-        toast.error('Failed to load prompt');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (open) {
+    if (!open) {
+      // Reset state when modal closes
+      setPrompt("");
+      setIsLoading(false);
+      setIsSaving(false);
+    } else {
       fetchPrompt();
     }
   }, [open]);
+
+  const fetchPrompt = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'email_template_prompt')
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setPrompt(data.setting_value);
+      }
+    } catch (error) {
+      console.error('Error fetching prompt:', error);
+      toast.error('Failed to load prompt');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -62,8 +67,12 @@ const PromptEditor = ({ open, onOpenChange }: PromptEditorProps) => {
     }
   };
 
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl h-[80vh]">
         <DialogHeader>
           <DialogTitle>Edit Email Template Generation Prompt</DialogTitle>
@@ -84,7 +93,7 @@ const PromptEditor = ({ open, onOpenChange }: PromptEditorProps) => {
               <div className="flex justify-end gap-2 mt-4">
                 <Button
                   variant="outline"
-                  onClick={() => onOpenChange(false)}
+                  onClick={handleClose}
                   disabled={isSaving}
                 >
                   Cancel

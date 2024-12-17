@@ -83,6 +83,9 @@ const Index = () => {
           } catch (error) {
             console.error('Error generating template:', error);
             toast.error('Failed to generate template. Please check your API key and try again.');
+          } finally {
+            setIsProcessing(false);
+            setProcessingStep(0);
           }
         }
       };
@@ -90,7 +93,6 @@ const Index = () => {
     } catch (error) {
       console.error('Error processing file:', error);
       toast.error('Error processing the image');
-    } finally {
       setIsProcessing(false);
       setProcessingStep(0);
     }
