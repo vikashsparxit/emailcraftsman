@@ -17,6 +17,7 @@ const FileUpload = ({ onFileUpload }: FileUploadProps) => {
     const checkApiKey = async () => {
       try {
         const key = await getApiKey();
+        console.log('Checking API key status:', !!key);
         setHasApiKey(!!key);
       } catch (error) {
         console.error('Error checking API key:', error);
@@ -37,6 +38,7 @@ const FileUpload = ({ onFileUpload }: FileUploadProps) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
       if (file.type.startsWith('image/')) {
+        console.log('Processing file:', file.name);
         onFileUpload(file);
         toast.success('Image uploaded successfully');
       } else {
@@ -56,7 +58,11 @@ const FileUpload = ({ onFileUpload }: FileUploadProps) => {
 
   const handleAddApiKey = () => {
     const apiKeyButton = document.querySelector<HTMLElement>('[aria-label="API Keys"]');
-    apiKeyButton?.click();
+    if (apiKeyButton) {
+      apiKeyButton.click();
+    } else {
+      toast.error('API key settings button not found');
+    }
   };
 
   if (isCheckingKey) {

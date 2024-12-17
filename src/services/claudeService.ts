@@ -15,17 +15,13 @@ export const generateEmailTemplate = async (imageBase64: string, apiKey: string)
   }
 
   try {
-    // Add mode: 'cors' and additional headers
+    // Remove mode: 'cors' and CORS headers since they should be handled server-side
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2024-01-01',
-        'x-api-key': apiKey,
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, anthropic-version, x-api-key'
+        'x-api-key': apiKey
       },
       body: JSON.stringify({
         model: 'claude-3-opus-20240229',
@@ -78,18 +74,11 @@ export const generateEmailTemplate = async (imageBase64: string, apiKey: string)
   } catch (error: any) {
     console.error('Error generating template:', error);
     
-    // Enhanced error handling
-    if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
-      const errorMessage = 'Unable to connect to Claude API. This might be due to CORS restrictions. Please ensure you have the correct API key and try again.';
+    // If it's a CORS error, provide a more helpful message
+    if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+      const errorMessage = 'Unable to connect to Claude API directly. You may need to use a proxy server or serverless function to make this request.';
       toast.error(errorMessage);
       throw new Error(errorMessage);
-    }
-    
-    // If it's a CORS error
-    if (error.message.includes('CORS')) {
-      const corsError = 'CORS error: Unable to access Claude API directly. Please check your API key and try again.';
-      toast.error(corsError);
-      throw new Error(corsError);
     }
 
     // For all other errors
