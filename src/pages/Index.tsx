@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import FileUpload from '@/components/FileUpload';
 import CodeEditor from '@/components/CodeEditor';
 import Preview from '@/components/Preview';
@@ -9,19 +9,19 @@ import { toast } from 'sonner';
 const Index = () => {
   const [html, setHtml] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
-
-  useEffect(() => {
-    const savedHtml = localStorage.getItem('emailTemplate');
-    if (savedHtml) {
-      setHtml(savedHtml);
-    }
-  }, []);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
   const handleFileUpload = async (file: File) => {
     setIsProcessing(true);
-    // TODO: Integrate with Claude AI API
-    // For now, we'll use a placeholder template
-    const template = `
+    console.log('Processing file:', file.name);
+    
+    try {
+      // Create a URL for the uploaded image
+      const imageUrl = URL.createObjectURL(file);
+      setUploadedImage(imageUrl);
+      
+      // For now, we'll use a placeholder template that includes the uploaded image
+      const template = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,6 +33,7 @@ const Index = () => {
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
       <td style="padding: 20px; text-align: center; background-color: #f8f9fa;">
+        <img src="${imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto; margin-bottom: 20px;" />
         <h1 style="color: #1a202c;">Your Email Template</h1>
         <p style="color: #4a5568;">This is a placeholder template. The actual template will be generated using Claude AI.</p>
       </td>
@@ -40,10 +41,16 @@ const Index = () => {
   </table>
 </body>
 </html>`;
-    
-    setHtml(template);
-    localStorage.setItem('emailTemplate', template);
-    setIsProcessing(false);
+      
+      setHtml(template);
+      localStorage.setItem('emailTemplate', template);
+      toast.success('Image uploaded and template generated successfully');
+    } catch (error) {
+      console.error('Error processing file:', error);
+      toast.error('Error processing the image');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCodeChange = (value: string | undefined) => {
