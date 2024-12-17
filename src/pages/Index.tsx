@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import FileUpload from '@/components/FileUpload';
-import CodeEditor from '@/components/CodeEditor';
-import Preview from '@/components/Preview';
+import TemplateEditor from '@/components/TemplateEditor';
+import AutoSave from '@/components/AutoSave';
 import { Button } from '@/components/ui/button';
 import { Download, Settings, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
-import { generateEmailTemplate } from '@/utils/claudeApi';
-import { Input } from '@/components/ui/input';
+import { generateEmailTemplate } from '@/services/claudeService';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
 import { initDB, saveApiKey, getApiKey } from '@/utils/indexDB';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthForm } from '@/components/AuthForm';
@@ -21,42 +21,10 @@ import { AuthForm } from '@/components/AuthForm';
 const Index = () => {
   const [html, setHtml] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const { user, logout } = useAuth();
-
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        await initDB();
-        const savedKey = await getApiKey();
-        if (savedKey) {
-          setApiKey(savedKey);
-          console.log('API key loaded from IndexDB');
-        }
-      } catch (error) {
-        console.error('Error initializing IndexDB:', error);
-        toast.error('Failed to load saved settings');
-      }
-    };
-    
-    initialize();
-  }, []);
-
-  // Auto-save effect
-  useEffect(() => {
-    if (!html) return;
-
-    const saveTimer = setTimeout(() => {
-      // Here we'll implement the auto-save logic once we add authentication
-      setLastSavedAt(new Date());
-      console.log('Changes auto-saved');
-    }, 2000);
-
-    return () => clearTimeout(saveTimer);
-  }, [html]);
 
   const handleFileUpload = async (file: File) => {
     setIsProcessing(true);
@@ -70,21 +38,18 @@ const Index = () => {
         return;
       }
       
-      const imageUrl = URL.createObjectURL(file);
-      setUploadedImage(imageUrl);
-      
       const reader = new FileReader();
       reader.onload = async (e) => {
         if (e.target?.result) {
           const base64Image = e.target.result as string;
           
           try {
-            const template = await generateEmailTemplate(base64Image);
+            const template = await generateEmailTemplate(base64Image, savedKey);
             setHtml(template);
             toast.success('Template generated successfully');
           } catch (error) {
             console.error('Error generating template:', error);
-            toast.error('Failed to generate template');
+            toast.error('Failed to generate template. Please check your API key and try again.');
           }
         }
       };
@@ -94,12 +59,6 @@ const Index = () => {
       toast.error('Error processing the image');
     } finally {
       setIsProcessing(false);
-    }
-  };
-
-  const handleCodeChange = (value: string | undefined) => {
-    if (value) {
-      setHtml(value);
     }
   };
 
@@ -126,6 +85,12 @@ const Index = () => {
       toast.error('Failed to save API key');
     }
   };
+
+  const handleAutoSave = useCallback(() => {
+    // Here we'll implement the actual save logic once we add a backend
+    setLastSavedAt(new Date());
+    console.log('Changes auto-saved');
+  }, []);
 
   if (!user) {
     return (
@@ -197,18 +162,9 @@ const Index = () => {
           </div>
         )}
 
-        {html && (
-          <div className="grid grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
-            <CodeEditor value={html} onChange={handleCodeChange} />
-            <Preview html={html} />
-          </div>
-        )}
+        {html && <TemplateEditor html={html} onHtmlChange={setHtml} />}
 
-        {lastSavedAt && (
-          <div className="text-sm text-gray-400 text-right">
-            Last saved: {lastSavedAt.toLocaleTimeString()}
-          </div>
-        )}
+        <AutoSave html={html} lastSaved={lastSavedAt} onSave={handleAutoSave} />
       </div>
     </div>
   );
