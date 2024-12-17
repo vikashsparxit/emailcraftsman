@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { LogIn, User, Edit } from 'lucide-react';
+import { LogIn, User, Edit2, Key, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Template } from '@/utils/indexDB';
 import SavedTemplates from './SavedTemplates';
@@ -21,9 +21,10 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface UserNavProps {
   onOpenTemplate?: (template: Template) => void;
+  onOpenSettings: () => void;
 }
 
-export function UserNav({ onOpenTemplate }: UserNavProps) {
+export function UserNav({ onOpenTemplate, onOpenSettings }: UserNavProps) {
   const { user, signInWithGoogle, logout } = useAuth();
   const [isPromptEditorOpen, setIsPromptEditorOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -35,17 +36,14 @@ export function UserNav({ onOpenTemplate }: UserNavProps) {
     <div className="flex items-center gap-4">
       {user ? (
         <>
-          <SavedTemplates onOpenTemplate={onOpenTemplate} />
-          {isAdmin && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setIsPromptEditorOpen(true)}
-              className="bg-purple-100 hover:bg-purple-200 border-purple-200"
-            >
-              <Edit className="h-4 w-4 text-purple-600" />
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 bg-purple-100 hover:bg-purple-200 border-purple-200"
+          >
+            <FileText className="h-4 w-4 text-purple-600" />
+            <SavedTemplates onOpenTemplate={onOpenTemplate} />
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative h-8 w-8 rounded-full">
@@ -60,6 +58,16 @@ export function UserNav({ onOpenTemplate }: UserNavProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem className="text-sm text-gray-500">
                 {user.email}
+              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => setIsPromptEditorOpen(true)}>
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Prompt
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={onOpenSettings}>
+                <Key className="mr-2 h-4 w-4" />
+                Edit Secret Key
               </DropdownMenuItem>
               <DropdownMenuItem onClick={logout}>
                 Log out

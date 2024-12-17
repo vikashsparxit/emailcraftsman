@@ -44,10 +44,10 @@ const SavedTemplates = ({ onOpenTemplate }: SavedTemplatesProps) => {
 
   if (isLoading) {
     return (
-      <Button variant="ghost" size="sm" disabled>
+      <span className="flex items-center">
         <Loader2 className="h-4 w-4 animate-spin mr-2" />
         Loading...
-      </Button>
+      </span>
     );
   }
 
@@ -58,13 +58,9 @@ const SavedTemplates = ({ onOpenTemplate }: SavedTemplatesProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-        >
+        <span className="text-purple-600">
           Saved Templates
-        </Button>
+        </span>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="end">
         <div className="p-4 border-b">
