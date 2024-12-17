@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { getLatestTemplate, Template } from '@/utils/indexDB';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Edit2 } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface SavedTemplatesProps {
   onOpenTemplate?: (template: Template) => void;
@@ -28,69 +33,73 @@ const SavedTemplates = ({ onOpenTemplate }: SavedTemplatesProps) => {
     if (onOpenTemplate) {
       onOpenTemplate(template);
     } else {
-      console.error('onOpenInEditor callback is not defined');
+      console.error('onOpenTemplate callback is not defined');
     }
   };
 
   if (error) {
     console.error('Error fetching templates:', error);
-    return (
-      <div className="p-4 text-red-500">
-        Error loading templates. Please try again later.
-      </div>
-    );
+    return null;
   }
 
   if (isLoading) {
     return (
-      <div className="p-4 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" />
-        <span>Loading saved templates...</span>
-      </div>
+      <Button variant="ghost" size="sm" disabled>
+        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        Loading...
+      </Button>
     );
   }
 
   if (!templates?.length) {
-    return (
-      <div className="p-4 text-gray-500">
-        No saved templates found. Generate a template to see it here.
-      </div>
-    );
+    return null;
   }
 
   return (
-    <ScrollArea className="h-[400px] w-full">
-      <div className="p-4">
-        <h2 className="text-lg font-semibold mb-4">Saved Templates</h2>
-        <div className="space-y-4">
-          {templates.map((template, index) => (
-            <div 
-              key={index} 
-              className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              <div className="text-sm text-gray-500">
-                Last updated: {new Date(template.updatedAt).toLocaleString()}
-              </div>
-              <div className="mt-2 text-sm">
-                <div className="font-medium mb-1">Template Preview</div>
-                <div className="text-gray-600 dark:text-gray-400 line-clamp-3">
-                  {template.html.substring(0, 150)}...
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+        >
+          Saved Templates
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[400px] p-0" align="end">
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-semibold">Saved Templates</h2>
+        </div>
+        <ScrollArea className="h-[300px]">
+          <div className="p-4 space-y-4">
+            {templates.map((template, index) => (
+              <div 
+                key={index} 
+                className="p-4 border rounded-lg hover:bg-gray-50 space-y-2"
+              >
+                <div className="text-sm text-gray-500">
+                  Last updated: {new Date(template.updatedAt).toLocaleString()}
                 </div>
-              </div>
-              <div className="mt-4">
+                <div>
+                  <div className="font-medium mb-1">Template Preview</div>
+                  <div className="text-sm text-gray-600 line-clamp-3 font-mono bg-gray-50 p-2 rounded">
+                    {template.html.substring(0, 150)}...
+                  </div>
+                </div>
                 <Button
                   onClick={() => handleOpenInEditor(template)}
-                  className="flex items-center gap-2"
+                  className="w-full flex items-center justify-center gap-2"
+                  variant="default"
                 >
                   <Edit2 className="w-4 h-4" />
                   Open in Editor
                 </Button>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </ScrollArea>
+            ))}
+          </div>
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
   );
 };
 
