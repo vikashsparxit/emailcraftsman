@@ -20,6 +20,11 @@ const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
     }
   });
 
+  const handleOpenInEditor = (html: string) => {
+    console.log('Opening template in editor:', html.substring(0, 100) + '...');
+    onOpenInEditor?.(html);
+  };
+
   if (error) {
     console.error('Error fetching templates:', error);
     return (
@@ -67,7 +72,7 @@ const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
               </div>
               <div className="mt-4">
                 <Button
-                  onClick={() => onOpenInEditor?.(template.html)}
+                  onClick={() => handleOpenInEditor(template.html)}
                   className="flex items-center gap-2"
                 >
                   <Edit2 className="w-4 h-4" />

@@ -22,7 +22,8 @@ const NotesPanel = ({ notes }: NotesPanelProps) => {
     .split('\n')
     .filter(line => 
       !line.includes("boilerplate code") && 
-      !line.includes("Let me know if you need")
+      !line.includes("Let me know if you need") &&
+      line.trim() !== ''
     )
     .join('\n');
 
