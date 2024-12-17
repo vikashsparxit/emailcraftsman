@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { saveTemplate, updateTemplate, getLatestTemplate } from '@/utils/indexDB';
@@ -12,6 +12,7 @@ interface AutoSaveProps {
 const AutoSave = ({ html, lastSaved, onSave }: AutoSaveProps) => {
   const { user } = useAuth();
   const [templateId, setTemplateId] = useState<number | null>(null);
+  const previousHtmlRef = useRef<string>(html);
 
   useEffect(() => {
     // Load the latest template on component mount
@@ -20,6 +21,7 @@ const AutoSave = ({ html, lastSaved, onSave }: AutoSaveProps) => {
         const template = await getLatestTemplate();
         if (template) {
           setTemplateId(template.id);
+          previousHtmlRef.current = template.html;
         }
       } catch (error) {
         console.error('Error loading latest template:', error);
@@ -34,6 +36,12 @@ const AutoSave = ({ html, lastSaved, onSave }: AutoSaveProps) => {
   useEffect(() => {
     if (!html || !user) return;
 
+    // Check if content has actually changed
+    if (html === previousHtmlRef.current) {
+      console.log('No changes detected, skipping save');
+      return;
+    }
+
     const saveTimer = setTimeout(async () => {
       try {
         if (templateId) {
@@ -45,8 +53,9 @@ const AutoSave = ({ html, lastSaved, onSave }: AutoSaveProps) => {
             setTemplateId(latest.id);
           }
         }
+        previousHtmlRef.current = html;
         onSave();
-        console.log('Changes auto-saved successfully');
+        console.log('Changes detected and auto-saved successfully');
       } catch (error) {
         console.error('Error saving template:', error);
         toast.error('Failed to save changes');
