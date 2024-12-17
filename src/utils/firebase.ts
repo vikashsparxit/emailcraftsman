@@ -15,6 +15,11 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
+// Configure Google Auth Provider
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
 // Enable persistence to keep the user logged in
 setPersistence(auth, browserLocalPersistence)
   .then(() => {

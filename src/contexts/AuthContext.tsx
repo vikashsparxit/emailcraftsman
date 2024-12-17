@@ -38,9 +38,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success('Signed in successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign in error:', error);
-      toast.error('Failed to sign in');
+      toast.error(error.message || 'Failed to sign in');
       throw error;
     }
   };
@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       toast.success('Account created successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign up error:', error);
-      toast.error('Failed to create account');
+      toast.error(error.message || 'Failed to create account');
       throw error;
     }
   };
@@ -60,9 +60,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await signInWithPopup(auth, googleProvider);
       toast.success('Signed in with Google successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google sign in error:', error);
-      toast.error('Failed to sign in with Google');
+      toast.error(error.message || 'Failed to sign in with Google');
       throw error;
     }
   };
@@ -71,9 +71,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await signOut(auth);
       toast.success('Signed out successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign out error:', error);
-      toast.error('Failed to sign out');
+      toast.error(error.message || 'Failed to sign out');
       throw error;
     }
   };
