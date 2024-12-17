@@ -17,13 +17,14 @@ export const AuthForm = () => {
       } else {
         await signUp(email, password);
       }
+      // Dialog will automatically close due to auth state change
     } catch (error) {
       console.error('Auth error:', error);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6 p-6 bg-card rounded-lg shadow-lg">
+    <div className="w-full max-w-md mx-auto space-y-6">
       <h2 className="text-2xl font-bold text-center">
         {isLogin ? 'Sign In' : 'Create Account'}
       </h2>
