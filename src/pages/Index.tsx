@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { initDB, saveApiKey, getApiKey } from '@/utils/indexDB';
+import { getApiKey } from '@/utils/indexDB';
 import { AuthForm } from '@/components/AuthForm';
 import LandingPage from '@/components/LandingPage';
 import EditorView from '@/components/EditorView';
@@ -17,8 +17,29 @@ import ProcessingLoader from '@/components/ProcessingLoader';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from "@/integrations/supabase/client";
 
+interface GeneratedContent {
+  html: string;
+  notes?: string;
+}
+
+const extractTemplateContent = (response: string): GeneratedContent => {
+  // Extract notes if they exist (everything after "Key points:")
+  const notesMatch = response.match(/Key points:\s*([\s\S]*)/);
+  const notes = notesMatch ? notesMatch[1].trim() : '';
+
+  // Extract HTML (everything between the first and last HTML tags)
+  const htmlMatch = response.match(/<html[\s\S]*<\/html>/);
+  const html = htmlMatch ? htmlMatch[0] : '';
+
+  return {
+    html,
+    notes: notes || undefined
+  };
+};
+
 const Index = () => {
   const [html, setHtml] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
   const [apiKey, setApiKey] = useState<string>('');
@@ -42,7 +63,6 @@ const Index = () => {
         return;
       }
 
-      // Fetch the current prompt template
       const { data: promptData, error: promptError } = await supabase
         .from('admin_settings')
         .select('setting_value')
@@ -68,6 +88,7 @@ const Index = () => {
             setProcessingStep(4);
             
             const template = await generateEmailTemplate(base64Image, promptData.setting_value);
+            const { html: extractedHtml, notes: extractedNotes } = extractTemplateContent(template);
             
             setProcessingStep(5);
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -77,7 +98,8 @@ const Index = () => {
             await new Promise(resolve => setTimeout(resolve, 800));
             setProcessingStep(8);
             
-            setHtml(template);
+            setHtml(extractedHtml);
+            setNotes(extractedNotes || '');
             setShowEditor(true);
             toast.success('Template generated successfully');
           } catch (error) {
@@ -132,7 +154,6 @@ const Index = () => {
       setShowAuthForm(true);
       return;
     }
-    // Save template logic here
     handleAutoSave();
     toast.success('Template saved successfully');
   };
@@ -151,6 +172,7 @@ const Index = () => {
       {showEditor && (
         <EditorView
           html={html}
+          notes={notes}
           onHtmlChange={setHtml}
           onClose={() => setShowEditor(false)}
           lastSavedAt={lastSavedAt}

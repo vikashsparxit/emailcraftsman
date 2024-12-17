@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import TemplateEditor from './TemplateEditor';
 import AutoSave from './AutoSave';
+import NotesPanel from './NotesPanel';
 import { Button } from './ui/button';
 import { ArrowLeft, Download } from 'lucide-react';
 import { toast } from 'sonner';
@@ -8,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface EditorViewProps {
   html: string;
+  notes?: string;
   onHtmlChange: (value: string) => void;
   onClose: () => void;
   lastSavedAt: Date | null;
@@ -17,6 +19,7 @@ interface EditorViewProps {
 
 const EditorView = ({ 
   html, 
+  notes,
   onHtmlChange, 
   onClose, 
   lastSavedAt, 
@@ -34,7 +37,6 @@ const EditorView = ({
   };
 
   useEffect(() => {
-    // Prevent scrolling on the body when editor is open
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = 'unset';
@@ -44,16 +46,18 @@ const EditorView = ({
   return (
     <div className="fixed inset-0 bg-gray-900 z-50 overflow-hidden">
       <div className="h-full flex flex-col p-6">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleClose}
-            className="text-gray-100 hover:bg-gray-800"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              className="text-gray-100 hover:bg-gray-800"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            {notes && <NotesPanel notes={notes} />}
+          </div>
           
           <div className="flex items-center gap-4">
             <Button
@@ -75,7 +79,6 @@ const EditorView = ({
           </div>
         </div>
 
-        {/* Editor */}
         <TemplateEditor html={html} onHtmlChange={onHtmlChange} />
         <AutoSave html={html} lastSaved={lastSavedAt} onSave={onSave} />
       </div>
