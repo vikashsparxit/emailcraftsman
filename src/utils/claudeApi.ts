@@ -1,14 +1,20 @@
 import { toast } from "sonner";
+import { getApiKey } from "./indexDB";
 
 export const generateEmailTemplate = async (imageBase64: string): Promise<string> => {
   console.log('Generating email template from image...');
   
   try {
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      throw new Error('API key not found');
+    }
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': localStorage.getItem('CLAUDE_API_KEY') || '',
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
