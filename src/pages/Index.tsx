@@ -15,6 +15,7 @@ import LandingPage from '@/components/LandingPage';
 import EditorView from '@/components/EditorView';
 import ProcessingLoader from '@/components/ProcessingLoader';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [html, setHtml] = useState<string>('');
@@ -40,12 +41,19 @@ const Index = () => {
         setIsSettingsOpen(true);
         return;
       }
-      
-      // Simulate steps with delays
-      const simulateStep = async (step: number, delay: number) => {
-        await new Promise(resolve => setTimeout(resolve, delay));
-        setProcessingStep(step);
-      };
+
+      // Fetch the current prompt template
+      const { data: promptData, error: promptError } = await supabase
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'email_template_prompt')
+        .single();
+
+      if (promptError) {
+        console.error('Error fetching prompt template:', promptError);
+        toast.error('Failed to fetch prompt template');
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -53,12 +61,21 @@ const Index = () => {
           const base64Image = e.target.result as string;
           
           try {
-            await simulateStep(2, 1000);
-            await simulateStep(3, 1500);
-            await simulateStep(4, 1000);
+            setProcessingStep(2);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setProcessingStep(3);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            setProcessingStep(4);
             
-            const template = await generateEmailTemplate(base64Image);
-            await simulateStep(5, 500);
+            const template = await generateEmailTemplate(base64Image, promptData.setting_value);
+            
+            setProcessingStep(5);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setProcessingStep(6);
+            await new Promise(resolve => setTimeout(resolve, 800));
+            setProcessingStep(7);
+            await new Promise(resolve => setTimeout(resolve, 800));
+            setProcessingStep(8);
             
             setHtml(template);
             setShowEditor(true);
