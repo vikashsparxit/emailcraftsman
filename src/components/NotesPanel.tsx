@@ -1,6 +1,5 @@
-import React from 'react';
-import { FileText } from 'lucide-react';
-import { Button } from './ui/button';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -9,21 +8,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { FileText } from 'lucide-react';
 
 interface NotesPanelProps {
   notes: string;
 }
 
 const NotesPanel = ({ notes }: NotesPanelProps) => {
-  if (!notes) return null;
-
-  const notePoints = notes
-    .split('\n')
-    .filter(line => line.trim())
-    .map(line => line.trim());
+  const [open, setOpen] = useState(false);
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
@@ -37,19 +32,10 @@ const NotesPanel = ({ notes }: NotesPanelProps) => {
         <SheetHeader>
           <SheetTitle>Template Notes</SheetTitle>
         </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-8rem)] mt-4">
-          <div className="space-y-4 pr-4">
-            {notePoints.map((point, index) => (
-              <div key={index} className="text-sm">
-                {point.startsWith('-') ? (
-                  <div className="flex gap-2">
-                    <span className="text-gray-400">•</span>
-                    <span>{point.substring(1).trim()}</span>
-                  </div>
-                ) : (
-                  <p className="font-medium">{point}</p>
-                )}
-              </div>
+        <ScrollArea className="h-[calc(100vh-8rem)] mt-4 pr-4">
+          <div className="space-y-4 text-sm">
+            {notes.split('\n').map((line, index) => (
+              <p key={index}>{line}</p>
             ))}
           </div>
         </ScrollArea>
