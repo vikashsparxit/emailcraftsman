@@ -37,7 +37,7 @@ const LandingPage = ({ onFileUpload, onOpenSettings, onOpenTemplate }: LandingPa
             >
               <KeyRound className="h-4 w-4 text-purple-600" />
             </Button>
-            <UserNav onOpenTemplate={onOpenTemplate} />
+            <UserNav onOpenTemplate={onOpenTemplate} onOpenSettings={onOpenSettings} />
           </div>
         </div>
 
