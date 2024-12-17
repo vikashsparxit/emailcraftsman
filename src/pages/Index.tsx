@@ -15,7 +15,7 @@ import LandingPage from '@/components/LandingPage';
 import EditorView from '@/components/EditorView';
 import ProcessingLoader from '@/components/ProcessingLoader';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserNav } from '@/components/UserNav';
+import Header from '@/components/Header';
 import { supabase } from "@/integrations/supabase/client";
 
 interface GeneratedContent {
@@ -24,11 +24,9 @@ interface GeneratedContent {
 }
 
 const extractTemplateContent = (response: string): GeneratedContent => {
-  // Extract notes if they exist (everything after "Key points:")
   const notesMatch = response.match(/Key points:\s*([\s\S]*)/);
   const notes = notesMatch ? notesMatch[1].trim() : '';
 
-  // Extract HTML (everything between the first and last HTML tags)
   const htmlMatch = response.match(/<html[\s\S]*<\/html>/);
   const html = htmlMatch ? htmlMatch[0] : '';
 
@@ -162,38 +160,36 @@ const Index = () => {
   const handleOpenTemplate = (templateHtml: string) => {
     console.log('Opening template in editor:', templateHtml.substring(0, 100) + '...');
     setHtml(templateHtml);
+    setNotes(''); // Reset notes for loaded template
     setShowEditor(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <header className="border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Email Crafter</h1>
-          <UserNav onOpenTemplate={handleOpenTemplate} />
-        </div>
-      </header>
+      <Header onOpenTemplate={handleOpenTemplate} />
 
-      {!showEditor && !isProcessing && (
-        <LandingPage 
-          onFileUpload={handleFileUpload}
-          onOpenSettings={() => setIsSettingsOpen(true)}
-        />
-      )}
+      <main>
+        {!showEditor && !isProcessing && (
+          <LandingPage 
+            onFileUpload={handleFileUpload}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+          />
+        )}
 
-      {isProcessing && <ProcessingLoader currentStep={processingStep} />}
+        {isProcessing && <ProcessingLoader currentStep={processingStep} />}
 
-      {showEditor && (
-        <EditorView
-          html={html}
-          notes={notes}
-          onHtmlChange={setHtml}
-          onClose={() => setShowEditor(false)}
-          lastSavedAt={lastSavedAt}
-          onSave={handleSave}
-          onExport={handleExport}
-        />
-      )}
+        {showEditor && (
+          <EditorView
+            html={html}
+            notes={notes}
+            onHtmlChange={setHtml}
+            onClose={() => setShowEditor(false)}
+            lastSavedAt={lastSavedAt}
+            onSave={handleSave}
+            onExport={handleExport}
+          />
+        )}
+      </main>
 
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <DialogContent>
