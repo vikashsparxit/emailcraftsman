@@ -3,7 +3,7 @@ import FileUpload from '@/components/FileUpload';
 import CodeEditor from '@/components/CodeEditor';
 import Preview from '@/components/Preview';
 import { Button } from '@/components/ui/button';
-import { Download, Settings } from 'lucide-react';
+import { Download, Settings, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateEmailTemplate } from '@/utils/claudeApi';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { initDB, saveApiKey, getApiKey } from '@/utils/indexDB';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthForm } from '@/components/AuthForm';
 
 const Index = () => {
   const [html, setHtml] = useState<string>('');
@@ -23,6 +25,7 @@ const Index = () => {
   const [apiKey, setApiKey] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const initialize = async () => {
@@ -124,6 +127,14 @@ const Index = () => {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+        <AuthForm />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -132,7 +143,7 @@ const Index = () => {
           <div className="flex items-center gap-4">
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="icon" className="text-gray-100 hover:text-gray-900">
+                <Button variant="outline" size="icon" className="text-gray-100 hover:bg-gray-800">
                   <Settings className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -167,6 +178,15 @@ const Index = () => {
             >
               <Download className="w-4 h-4" />
               Export HTML
+            </Button>
+
+            <Button
+              onClick={logout}
+              variant="ghost"
+              size="icon"
+              className="text-gray-100 hover:bg-gray-800"
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
