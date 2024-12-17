@@ -23,18 +23,11 @@ interface GeneratedContent {
 }
 
 const extractTemplateContent = (response: string): GeneratedContent => {
-  // Extract notes if they exist (everything after "Key points:")
   const notesMatch = response.match(/Key points:\s*([\s\S]*)/);
   const notes = notesMatch ? notesMatch[1].trim() : '';
-
-  // Extract HTML (everything between the first and last HTML tags)
   const htmlMatch = response.match(/<html[\s\S]*<\/html>/);
   const html = htmlMatch ? htmlMatch[0] : '';
-
-  return {
-    html,
-    notes: notes || undefined
-  };
+  return { html, notes: notes || undefined };
 };
 
 const Index = () => {
@@ -158,12 +151,19 @@ const Index = () => {
     toast.success('Template saved successfully');
   };
 
+  const handleOpenTemplate = (templateHtml: string) => {
+    console.log('Index: Opening template in editor');
+    setHtml(templateHtml);
+    setShowEditor(true);
+  };
+
   return (
     <>
       {!showEditor && !isProcessing && (
         <LandingPage 
           onFileUpload={handleFileUpload}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenTemplate={handleOpenTemplate}
         />
       )}
 

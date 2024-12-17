@@ -22,7 +22,11 @@ const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
 
   const handleOpenInEditor = (html: string) => {
     console.log('Opening template in editor:', html.substring(0, 100) + '...');
-    onOpenInEditor?.(html);
+    if (onOpenInEditor) {
+      onOpenInEditor(html);
+    } else {
+      console.error('onOpenInEditor callback is not defined');
+    }
   };
 
   if (error) {

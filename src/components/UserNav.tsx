@@ -34,6 +34,7 @@ export function UserNav({ onOpenTemplate }: UserNavProps) {
   const isAdmin = user?.email === 'vikashshingh@gmail.com'
 
   const handleOpenTemplate = (html: string) => {
+    console.log('UserNav: Opening template with length:', html.length);
     onOpenTemplate?.(html);
     setShowSavedTemplates(false);
   };
