@@ -15,12 +15,17 @@ export const generateEmailTemplate = async (imageBase64: string, apiKey: string)
   }
 
   try {
+    // Add mode: 'cors' and additional headers
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2024-01-01',
         'x-api-key': apiKey,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, anthropic-version, x-api-key'
       },
       body: JSON.stringify({
         model: 'claude-3-opus-20240229',
@@ -70,15 +75,26 @@ export const generateEmailTemplate = async (imageBase64: string, apiKey: string)
 
     console.log('Template generated successfully');
     return data.content[0].text;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating template:', error);
     
-    // Check if it's a network error (CORS or connection issues)
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      toast.error('Network error. Please check your internet connection and try again.');
-      throw new Error('Network error while connecting to Claude API');
+    // Enhanced error handling
+    if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+      const errorMessage = 'Unable to connect to Claude API. This might be due to CORS restrictions. Please ensure you have the correct API key and try again.';
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    
+    // If it's a CORS error
+    if (error.message.includes('CORS')) {
+      const corsError = 'CORS error: Unable to access Claude API directly. Please check your API key and try again.';
+      toast.error(corsError);
+      throw new Error(corsError);
     }
 
+    // For all other errors
+    const genericError = error.message || 'An error occurred while generating the template';
+    toast.error(genericError);
     throw error;
   }
 };
