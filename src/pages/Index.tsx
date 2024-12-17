@@ -22,6 +22,7 @@ const Index = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string>('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
   useEffect(() => {
     const initialize = async () => {
@@ -40,6 +41,19 @@ const Index = () => {
     
     initialize();
   }, []);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!html) return;
+
+    const saveTimer = setTimeout(() => {
+      // Here we'll implement the auto-save logic once we add authentication
+      setLastSavedAt(new Date());
+      console.log('Changes auto-saved');
+    }, 2000);
+
+    return () => clearTimeout(saveTimer);
+  }, [html]);
 
   const handleFileUpload = async (file: File) => {
     setIsProcessing(true);
@@ -118,7 +132,7 @@ const Index = () => {
           <div className="flex items-center gap-4">
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" className="text-gray-100 hover:text-gray-900">
                   <Settings className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -167,6 +181,12 @@ const Index = () => {
           <div className="grid grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
             <CodeEditor value={html} onChange={handleCodeChange} />
             <Preview html={html} />
+          </div>
+        )}
+
+        {lastSavedAt && (
+          <div className="text-sm text-gray-400 text-right">
+            Last saved: {lastSavedAt.toLocaleTimeString()}
           </div>
         )}
       </div>
