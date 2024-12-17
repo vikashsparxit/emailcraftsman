@@ -7,20 +7,36 @@ const DB_VERSION = 2;
 
 export const initDB = (): Promise<void> => {
   return new Promise((resolve, reject) => {
+    console.log('Initializing IndexDB...');
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve();
+    request.onerror = () => {
+      console.error('Error opening IndexDB:', request.error);
+      reject(request.error);
+    };
+
+    request.onsuccess = () => {
+      console.log('IndexDB initialized successfully');
+      resolve();
+    };
 
     request.onupgradeneeded = (event) => {
+      console.log('Upgrading IndexDB schema...');
       const db = (event.target as IDBOpenDBRequest).result;
       
+      // Create apiKeys store if it doesn't exist
       if (!db.objectStoreNames.contains(STORES.apiKeys)) {
+        console.log('Creating apiKeys store...');
         db.createObjectStore(STORES.apiKeys);
       }
       
+      // Create templates store if it doesn't exist
       if (!db.objectStoreNames.contains(STORES.templates)) {
-        const templateStore = db.createObjectStore(STORES.templates, { keyPath: 'id', autoIncrement: true });
+        console.log('Creating templates store...');
+        const templateStore = db.createObjectStore(STORES.templates, { 
+          keyPath: 'id', 
+          autoIncrement: true 
+        });
         templateStore.createIndex('updatedAt', 'updatedAt');
       }
     };
@@ -29,6 +45,8 @@ export const initDB = (): Promise<void> => {
 
 export const saveApiKey = async (key: string): Promise<void> => {
   console.log('Saving API key to IndexDB...');
+  await initDB(); // Ensure DB is initialized before saving
+  
   const request = indexedDB.open(DB_NAME);
   
   return new Promise((resolve, reject) => {
@@ -43,15 +61,23 @@ export const saveApiKey = async (key: string): Promise<void> => {
         console.log('API key saved successfully');
         resolve();
       };
-      saveRequest.onerror = () => reject(saveRequest.error);
+      saveRequest.onerror = () => {
+        console.error('Error saving API key:', saveRequest.error);
+        reject(saveRequest.error);
+      };
     };
     
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('Error opening IndexDB:', request.error);
+      reject(request.error);
+    };
   });
 };
 
 export const getApiKey = async (): Promise<string | null> => {
   console.log('Fetching API key from IndexDB...');
+  await initDB(); // Ensure DB is initialized before getting key
+  
   const request = indexedDB.open(DB_NAME);
   
   return new Promise((resolve, reject) => {
@@ -66,10 +92,16 @@ export const getApiKey = async (): Promise<string | null> => {
         console.log('API key retrieved successfully');
         resolve(getRequest.result);
       };
-      getRequest.onerror = () => reject(getRequest.error);
+      getRequest.onerror = () => {
+        console.error('Error getting API key:', getRequest.error);
+        reject(getRequest.error);
+      };
     };
     
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('Error opening IndexDB:', request.error);
+      reject(request.error);
+    };
   });
 };
 
@@ -81,6 +113,8 @@ interface Template {
 
 export const saveTemplate = async (html: string): Promise<void> => {
   console.log('Saving template to IndexDB...');
+  await initDB(); // Ensure DB is initialized before saving
+  
   const request = indexedDB.open(DB_NAME);
   
   return new Promise((resolve, reject) => {
@@ -100,15 +134,23 @@ export const saveTemplate = async (html: string): Promise<void> => {
         console.log('Template saved successfully');
         resolve();
       };
-      saveRequest.onerror = () => reject(saveRequest.error);
+      saveRequest.onerror = () => {
+        console.error('Error saving template:', saveRequest.error);
+        reject(saveRequest.error);
+      };
     };
     
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('Error opening IndexDB:', request.error);
+      reject(request.error);
+    };
   });
 };
 
 export const updateTemplate = async (id: number, html: string): Promise<void> => {
   console.log('Updating template in IndexDB...');
+  await initDB(); // Ensure DB is initialized before updating
+  
   const request = indexedDB.open(DB_NAME);
   
   return new Promise((resolve, reject) => {
@@ -129,15 +171,23 @@ export const updateTemplate = async (id: number, html: string): Promise<void> =>
         console.log('Template updated successfully');
         resolve();
       };
-      updateRequest.onerror = () => reject(updateRequest.error);
+      updateRequest.onerror = () => {
+        console.error('Error updating template:', updateRequest.error);
+        reject(updateRequest.error);
+      };
     };
     
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('Error opening IndexDB:', request.error);
+      reject(request.error);
+    };
   });
 };
 
 export const getLatestTemplate = async (): Promise<Template | null> => {
   console.log('Fetching latest template from IndexDB...');
+  await initDB(); // Ensure DB is initialized before fetching
+  
   const request = indexedDB.open(DB_NAME);
   
   return new Promise((resolve, reject) => {
@@ -159,9 +209,15 @@ export const getLatestTemplate = async (): Promise<Template | null> => {
           resolve(null);
         }
       };
-      getRequest.onerror = () => reject(getRequest.error);
+      getRequest.onerror = () => {
+        console.error('Error getting latest template:', getRequest.error);
+        reject(getRequest.error);
+      };
     };
     
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('Error opening IndexDB:', request.error);
+      reject(request.error);
+    };
   });
 };
