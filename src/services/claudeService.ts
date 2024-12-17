@@ -1,7 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface GenerateTemplateResponse {
   template: string;
+  error?: string;
+  details?: string;
 }
 
 export const generateEmailTemplate = async (imageBase64: string): Promise<string> => {
@@ -13,8 +16,13 @@ export const generateEmailTemplate = async (imageBase64: string): Promise<string
     });
 
     if (error) {
-      console.error('Error generating template:', error);
-      throw error;
+      console.error('Supabase function error:', error);
+      throw new Error(error.message);
+    }
+
+    if (data?.error) {
+      console.error('Template generation error:', data.error, data.details);
+      throw new Error(data.error);
     }
 
     if (!data?.template) {
@@ -25,6 +33,7 @@ export const generateEmailTemplate = async (imageBase64: string): Promise<string
     return data.template;
   } catch (error: any) {
     console.error('Error generating template:', error);
+    toast.error(error.message || 'Failed to generate template');
     throw error;
   }
 };

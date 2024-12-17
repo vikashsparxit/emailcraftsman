@@ -14,15 +14,25 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64 } = await req.json()
-    console.log('Received image, generating template...')
+    if (!CLAUDE_API_KEY) {
+      console.error('CLAUDE_API_KEY not found in environment variables');
+      throw new Error('Claude API key not configured');
+    }
+
+    const { imageBase64 } = await req.json();
+    if (!imageBase64) {
+      console.error('No image data received');
+      throw new Error('No image data provided');
+    }
+
+    console.log('Received image data, calling Claude API...');
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2024-01-01',
-        'x-api-key': CLAUDE_API_KEY || '',
+        'x-api-key': CLAUDE_API_KEY,
+        'anthropic-version': '2024-01-01'
       },
       body: JSON.stringify({
         model: 'claude-3-opus-20240229',
@@ -45,28 +55,41 @@ serve(async (req) => {
           ]
         }]
       })
-    })
+    });
 
     if (!response.ok) {
-      const error = await response.text()
-      console.error('Claude API error:', error)
-      throw new Error(`Claude API error: ${error}`)
+      const errorText = await response.text();
+      console.error('Claude API error:', errorText);
+      throw new Error(`Claude API error: ${response.status} ${errorText}`);
     }
 
-    const data = await response.json()
-    console.log('Template generated successfully')
+    const data = await response.json();
+    console.log('Template generated successfully');
 
-    return new Response(JSON.stringify({ template: data.content[0].text }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  } catch (error) {
-    console.error('Error in generate-template function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ template: data.content[0].text }),
       { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
-    )
+    );
+  } catch (error) {
+    console.error('Error in generate-template function:', error);
+    
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || 'Internal server error',
+        details: error.toString()
+      }),
+      { 
+        status: 400,
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
   }
 })
