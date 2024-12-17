@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/contexts/AuthContext"
-import { Key, LogIn } from "lucide-react"
+import { LogIn } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -72,10 +72,6 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             Saved Templates
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => window.location.href = '#api-keys'}>
-            <Key className="mr-2 h-4 w-4" />
-            <span>API Keys</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
