@@ -1,13 +1,14 @@
-import { initializeApp } from 'firebase/auth';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAXvNNm3ewZ0D3q5CcFKs3cmDPfhw1ILdc",
+  authDomain: "emailcraftman.firebaseapp.com",
+  projectId: "emailcraftman",
+  storageBucket: "emailcraftman.firebasestorage.app",
+  messagingSenderId: "64726231528",
+  appId: "1:64726231528:web:5f9efa515560d1abab5c5d",
+  measurementId: "G-75TMMSZ2J5"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -15,6 +16,12 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Enable persistence to keep the user logged in
-auth.setPersistence('LOCAL');
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log('Firebase persistence enabled');
+  })
+  .catch((error) => {
+    console.error('Error setting persistence:', error);
+  });
 
 console.log('Firebase initialized');
