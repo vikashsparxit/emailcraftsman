@@ -8,6 +8,7 @@ interface ProcessingLoaderProps {
 
 const ProcessingLoader = ({ currentStep }: ProcessingLoaderProps) => {
   const [progress, setProgress] = useState(0);
+  const [waitingMessage, setWaitingMessage] = useState('');
   
   const steps = [
     'Preparing image for processing...',
@@ -18,6 +19,15 @@ const ProcessingLoader = ({ currentStep }: ProcessingLoaderProps) => {
     'Implementing dark mode support...',
     'Adding email client compatibility...',
     'Finalizing template generation...'
+  ];
+
+  const waitingMessages = [
+    'Still working on it...',
+    'This might take a moment...',
+    'Almost there...',
+    'Processing complex elements...',
+    'Hold on with us...',
+    'Sometimes this takes longer than usual...',
   ];
 
   useEffect(() => {
@@ -33,7 +43,16 @@ const ProcessingLoader = ({ currentStep }: ProcessingLoaderProps) => {
       });
     }, 20);
 
-    return () => clearInterval(interval);
+    // Rotate waiting messages
+    const messageInterval = setInterval(() => {
+      const randomMessage = waitingMessages[Math.floor(Math.random() * waitingMessages.length)];
+      setWaitingMessage(randomMessage);
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(messageInterval);
+    };
   }, [currentStep, steps.length]);
 
   return (
@@ -53,9 +72,15 @@ const ProcessingLoader = ({ currentStep }: ProcessingLoaderProps) => {
             Generating Your Email Template
           </h2>
           
-          <p className="text-lg text-blue-400 text-center mb-6 min-h-[28px] transition-all">
+          <p className="text-lg text-blue-400 text-center mb-2 min-h-[28px] transition-all">
             {steps[currentStep - 1]}
           </p>
+
+          {progress === (currentStep / steps.length) * 100 && progress < 100 && (
+            <p className="text-sm text-gray-400 text-center mb-4 italic transition-all">
+              {waitingMessage}
+            </p>
+          )}
           
           <Progress value={progress} className="w-full h-2" />
           

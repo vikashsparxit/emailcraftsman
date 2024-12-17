@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 import { Button } from './ui/button';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
@@ -36,20 +37,22 @@ const NotesPanel = ({ notes }: NotesPanelProps) => {
         <SheetHeader>
           <SheetTitle>Template Notes</SheetTitle>
         </SheetHeader>
-        <div className="mt-4 space-y-4">
-          {notePoints.map((point, index) => (
-            <div key={index} className="text-sm">
-              {point.startsWith('-') ? (
-                <div className="flex gap-2">
-                  <span className="text-gray-400">•</span>
-                  <span>{point.substring(1).trim()}</span>
-                </div>
-              ) : (
-                <p className="font-medium">{point}</p>
-              )}
-            </div>
-          ))}
-        </div>
+        <ScrollArea className="h-[calc(100vh-8rem)] mt-4">
+          <div className="space-y-4 pr-4">
+            {notePoints.map((point, index) => (
+              <div key={index} className="text-sm">
+                {point.startsWith('-') ? (
+                  <div className="flex gap-2">
+                    <span className="text-gray-400">•</span>
+                    <span>{point.substring(1).trim()}</span>
+                  </div>
+                ) : (
+                  <p className="font-medium">{point}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );

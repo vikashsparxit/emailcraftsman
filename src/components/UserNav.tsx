@@ -20,11 +20,13 @@ import {
 import { useState } from "react"
 import { AuthForm } from "./AuthForm"
 import PromptEditor from "./PromptEditor"
+import SavedTemplates from "./SavedTemplates"
 
 export function UserNav() {
   const { user, logout } = useAuth()
   const [showAuthForm, setShowAuthForm] = useState(false)
   const [showPromptEditor, setShowPromptEditor] = useState(false)
+  const [showSavedTemplates, setShowSavedTemplates] = useState(false)
   const isAdmin = user?.email === 'vikashshingh@gmail.com'
 
   if (!user) {
@@ -74,7 +76,7 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setShowSavedTemplates(true)}>
               Saved Templates
             </DropdownMenuItem>
             {isAdmin && (
@@ -89,6 +91,15 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <Dialog open={showSavedTemplates} onOpenChange={setShowSavedTemplates}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Saved Templates</DialogTitle>
+          </DialogHeader>
+          <SavedTemplates />
+        </DialogContent>
+      </Dialog>
 
       <PromptEditor 
         open={showPromptEditor} 
