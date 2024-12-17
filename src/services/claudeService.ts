@@ -17,19 +17,30 @@ export const generateEmailTemplate = async (imageBase64: string): Promise<string
 
     if (error) {
       console.error('Supabase function error:', error);
+      toast.error(`Error: ${error.message}`);
       throw new Error(error.message);
     }
 
-    if (data?.error) {
+    if (!data) {
+      console.error('No data received from function');
+      toast.error('No response received from server');
+      throw new Error('No response received from server');
+    }
+
+    if (data.error) {
       console.error('Template generation error:', data.error, data.details);
+      toast.error(`Error: ${data.error}`);
       throw new Error(data.error);
     }
 
-    if (!data?.template) {
+    if (!data.template) {
+      console.error('No template received from the API');
+      toast.error('Failed to generate template');
       throw new Error('No template received from the API');
     }
 
     console.log('Template generated successfully');
+    toast.success('Template generated successfully');
     return data.template;
   } catch (error: any) {
     console.error('Error generating template:', error);

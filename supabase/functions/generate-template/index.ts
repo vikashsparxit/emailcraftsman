@@ -19,13 +19,21 @@ serve(async (req) => {
       throw new Error('Claude API key not configured');
     }
 
-    const { imageBase64 } = await req.json();
+    const requestData = await req.json();
+    console.log('Received request data:', JSON.stringify(requestData));
+
+    const { imageBase64 } = requestData;
     if (!imageBase64) {
       console.error('No image data received');
       throw new Error('No image data provided');
     }
 
-    console.log('Received image data, calling Claude API...');
+    // Extract the base64 data after the comma if it includes the data URL prefix
+    const base64Data = imageBase64.includes('base64,') 
+      ? imageBase64.split('base64,')[1] 
+      : imageBase64;
+
+    console.log('Processing image data and calling Claude API...');
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -49,13 +57,15 @@ serve(async (req) => {
               source: {
                 type: 'base64',
                 media_type: 'image/png',
-                data: imageBase64.split(',')[1]
+                data: base64Data
               }
             }
           ]
         }]
       })
     });
+
+    console.log('Claude API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -64,7 +74,12 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('Template generated successfully');
+    console.log('Claude API response received successfully');
+
+    if (!data.content || !data.content[0] || !data.content[0].text) {
+      console.error('Unexpected Claude API response format:', data);
+      throw new Error('Invalid response format from Claude API');
+    }
 
     return new Response(
       JSON.stringify({ template: data.content[0].text }),
@@ -84,7 +99,7 @@ serve(async (req) => {
         details: error.toString()
       }),
       { 
-        status: 400,
+        status: 500, // Changed from 400 to 500 for server errors
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'
