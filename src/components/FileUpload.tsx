@@ -54,6 +54,11 @@ const FileUpload = ({ onFileUpload }: FileUploadProps) => {
     disabled: !hasApiKey
   });
 
+  const handleAddApiKey = () => {
+    const apiKeyButton = document.querySelector<HTMLElement>('[aria-label="API Keys"]');
+    apiKeyButton?.click();
+  };
+
   if (isCheckingKey) {
     return (
       <div className="border-2 border-dashed border-gray-600 rounded-lg h-[250px] flex items-center justify-center">
@@ -85,7 +90,7 @@ const FileUpload = ({ onFileUpload }: FileUploadProps) => {
             <h3 className="text-xl font-semibold mb-2">Claude API Key Required</h3>
             <p className="text-gray-400 mb-4">Please add your Claude API key to start generating templates.</p>
             <Button 
-              onClick={() => document.querySelector('[aria-label="API Keys"]')?.click()}
+              onClick={handleAddApiKey}
               variant="default"
             >
               Add API Key
