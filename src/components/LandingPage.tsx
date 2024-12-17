@@ -7,9 +7,10 @@ import { Key } from 'lucide-react';
 interface LandingPageProps {
   onFileUpload: (file: File) => void;
   onOpenSettings: () => void;
+  onOpenTemplate?: (html: string) => void;
 }
 
-const LandingPage = ({ onFileUpload, onOpenSettings }: LandingPageProps) => {
+const LandingPage = ({ onFileUpload, onOpenSettings, onOpenTemplate }: LandingPageProps) => {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-12">
@@ -26,7 +27,7 @@ const LandingPage = ({ onFileUpload, onOpenSettings }: LandingPageProps) => {
             >
               <Key className="h-4 w-4" />
             </Button>
-            <UserNav />
+            <UserNav onOpenTemplate={onOpenTemplate} />
           </div>
         </div>
 
