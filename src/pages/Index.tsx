@@ -15,7 +15,6 @@ import LandingPage from '@/components/LandingPage';
 import EditorView from '@/components/EditorView';
 import ProcessingLoader from '@/components/ProcessingLoader';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserNav } from '@/components/UserNav';
 import { supabase } from "@/integrations/supabase/client";
 
 interface GeneratedContent {
@@ -159,21 +158,8 @@ const Index = () => {
     toast.success('Template saved successfully');
   };
 
-  const handleOpenTemplate = (templateHtml: string) => {
-    console.log('Opening template in editor:', templateHtml.substring(0, 100) + '...');
-    setHtml(templateHtml);
-    setShowEditor(true);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
-      <header className="border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Email Crafter</h1>
-          <UserNav onOpenTemplate={handleOpenTemplate} />
-        </div>
-      </header>
-
+    <>
       {!showEditor && !isProcessing && (
         <LandingPage 
           onFileUpload={handleFileUpload}
@@ -228,7 +214,7 @@ const Index = () => {
           <AuthForm />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 
