@@ -20,12 +20,17 @@ serve(async (req) => {
     }
 
     const requestData = await req.json();
-    console.log('Received request data:', JSON.stringify(requestData));
+    console.log('Received request for template generation');
 
-    const { imageBase64 } = requestData;
+    const { imageBase64, prompt } = requestData;
     if (!imageBase64) {
       console.error('No image data received');
       throw new Error('No image data provided');
+    }
+
+    if (!prompt) {
+      console.error('No prompt received');
+      throw new Error('No prompt provided');
     }
 
     // Extract the base64 data after the comma if it includes the data URL prefix
@@ -40,7 +45,7 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01'  // Updated to use the correct version
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
         model: 'claude-3-opus-20240229',
@@ -50,7 +55,7 @@ serve(async (req) => {
           content: [
             {
               type: 'text',
-              text: 'Generate a responsive HTML email template that matches this image. Use modern email-compatible HTML and inline CSS. Make it mobile-friendly.'
+              text: prompt || 'Generate a responsive HTML email template that matches this image. Use modern email-compatible HTML and inline CSS. Make it mobile-friendly.'
             },
             {
               type: 'image',
@@ -82,7 +87,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ template: data.content[0].text }),
+      JSON.stringify({ html: data.content[0].text }),
       { 
         headers: { 
           ...corsHeaders,
