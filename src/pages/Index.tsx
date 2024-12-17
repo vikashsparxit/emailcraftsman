@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { getApiKey } from '@/utils/indexDB';
+import { getApiKey, saveApiKey } from '@/utils/indexDB';
 import { AuthForm } from '@/components/AuthForm';
 import LandingPage from '@/components/LandingPage';
 import EditorView from '@/components/EditorView';
