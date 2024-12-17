@@ -31,11 +31,11 @@ const FileUpload = ({ onFileUpload }: FileUploadProps) => {
   return (
     <div
       {...getRootProps()}
-      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+      className={`border-2 border-dashed rounded-lg h-[250px] flex flex-col items-center justify-center transition-colors
         ${isDragActive ? 'border-blue-500 bg-blue-50/5' : 'border-gray-600 hover:border-gray-500'}`}
     >
       <input {...getInputProps()} />
-      <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+      <Upload className="w-12 h-12 mb-4 text-gray-400" />
       <p className="text-lg text-gray-300">
         {isDragActive ? 'Drop the image here' : 'Drag & drop an image here, or click to select'}
       </p>

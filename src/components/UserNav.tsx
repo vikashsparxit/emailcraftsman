@@ -11,16 +11,41 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/contexts/AuthContext"
 import { Key, LogIn } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useState } from "react"
+import { AuthForm } from "./AuthForm"
 
 export function UserNav() {
   const { user, logout } = useAuth()
+  const [showAuthForm, setShowAuthForm] = useState(false)
 
   if (!user) {
     return (
-      <Button variant="ghost" size="sm" className="gap-2">
-        <LogIn className="h-4 w-4" />
-        Login
-      </Button>
+      <>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="gap-2 text-gray-100 hover:bg-gray-800"
+          onClick={() => setShowAuthForm(true)}
+        >
+          <LogIn className="h-4 w-4" />
+          Login
+        </Button>
+
+        <Dialog open={showAuthForm} onOpenChange={setShowAuthForm}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Sign In</DialogTitle>
+            </DialogHeader>
+            <AuthForm />
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 
@@ -37,7 +62,7 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.displayName}</p>
+            <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
@@ -48,7 +73,7 @@ export function UserNav() {
           <DropdownMenuItem>
             Saved Templates
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => window.location.href = '#api-keys'}>
             <Key className="mr-2 h-4 w-4" />
             <span>API Keys</span>
           </DropdownMenuItem>
