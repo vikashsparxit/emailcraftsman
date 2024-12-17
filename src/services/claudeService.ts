@@ -1,50 +1,30 @@
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
 
-interface GenerateTemplateResponse {
-  template: string;
-  error?: string;
-  details?: string;
-}
-
-export const generateEmailTemplate = async (imageBase64: string): Promise<string> => {
-  console.log('Generating email template from image...');
+export const generateEmailTemplate = async (imageBase64: string, prompt: string): Promise<string> => {
+  console.log('Generating email template with Claude...');
   
   try {
-    const { data, error } = await supabase.functions.invoke<GenerateTemplateResponse>('generate-template', {
-      body: { imageBase64 }
+    const { data, error } = await supabase.functions.invoke('generate-template', {
+      body: { 
+        image: imageBase64,
+        prompt: prompt
+      }
     });
 
     if (error) {
-      console.error('Supabase function error:', error);
-      toast.error(`Error: ${error.message}`);
-      throw new Error(error.message);
+      console.error('Error calling generate-template function:', error);
+      throw new Error('Failed to generate template');
     }
 
-    if (!data) {
-      console.error('No data received from function');
-      toast.error('No response received from server');
-      throw new Error('No response received from server');
-    }
-
-    if (data.error) {
-      console.error('Template generation error:', data.error, data.details);
-      toast.error(`Error: ${data.error}`);
-      throw new Error(data.error);
-    }
-
-    if (!data.template) {
-      console.error('No template received from the API');
-      toast.error('Failed to generate template');
-      throw new Error('No template received from the API');
+    if (!data || !data.html) {
+      console.error('No HTML template received from Claude');
+      throw new Error('No template generated');
     }
 
     console.log('Template generated successfully');
-    toast.success('Template generated successfully');
-    return data.template;
-  } catch (error: any) {
-    console.error('Error generating template:', error);
-    toast.error(error.message || 'Failed to generate template');
+    return data.html;
+  } catch (error) {
+    console.error('Error in generateEmailTemplate:', error);
     throw error;
   }
 };
