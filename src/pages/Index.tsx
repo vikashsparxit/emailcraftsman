@@ -5,6 +5,8 @@ import Preview from '@/components/Preview';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateEmailTemplate } from '@/utils/claudeApi';
+import { Input } from '@/components/ui/input';
 
 const Index = () => {
   const [html, setHtml] = useState<string>('');
@@ -20,31 +22,30 @@ const Index = () => {
       const imageUrl = URL.createObjectURL(file);
       setUploadedImage(imageUrl);
       
-      // For now, we'll use a placeholder template that includes the uploaded image
-      const template = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Template</title>
-</head>
-<body style="margin: 0; padding: 20px; font-family: Arial, sans-serif;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
-    <tr>
-      <td style="padding: 20px; text-align: center; background-color: #f8f9fa;">
-        <img src="${imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto; margin-bottom: 20px;" />
-        <h1 style="color: #1a202c;">Your Email Template</h1>
-        <p style="color: #4a5568;">This is a placeholder template. The actual template will be generated using Claude AI.</p>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-      
-      setHtml(template);
-      localStorage.setItem('emailTemplate', template);
-      toast.success('Image uploaded and template generated successfully');
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        if (e.target?.result) {
+          const base64Image = e.target.result as string;
+          
+          // Check if we have an API key
+          const apiKey = localStorage.getItem('CLAUDE_API_KEY');
+          if (!apiKey) {
+            toast.error('Please enter your Claude API key first');
+            return;
+          }
+          
+          try {
+            const template = await generateEmailTemplate(base64Image);
+            setHtml(template);
+            localStorage.setItem('emailTemplate', template);
+            toast.success('Template generated successfully');
+          } catch (error) {
+            console.error('Error generating template:', error);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error processing file:', error);
       toast.error('Error processing the image');
@@ -73,6 +74,11 @@ const Index = () => {
     toast.success('Template exported successfully');
   };
 
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    localStorage.setItem('CLAUDE_API_KEY', e.target.value);
+    toast.success('API key saved');
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -86,6 +92,16 @@ const Index = () => {
             <Download className="w-4 h-4" />
             Export HTML
           </Button>
+        </div>
+
+        <div className="max-w-md mx-auto mb-8">
+          <Input
+            type="password"
+            placeholder="Enter your Claude API key"
+            onChange={handleApiKeyChange}
+            defaultValue={localStorage.getItem('CLAUDE_API_KEY') || ''}
+            className="w-full"
+          />
         </div>
 
         {!html && (
