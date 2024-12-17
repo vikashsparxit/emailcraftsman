@@ -7,6 +7,7 @@ import ProcessingLoader from '@/components/ProcessingLoader';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTemplateGeneration } from '@/hooks/useTemplateGeneration';
 import SettingsManager from '@/components/SettingsManager';
+import { Template } from '@/utils/indexDB';
 
 const Index = () => {
   const [apiKey, setApiKey] = useState<string>('');
@@ -15,12 +16,12 @@ const Index = () => {
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const { user } = useAuth();
+  const [notes, setNotes] = useState<string>('');
 
   const {
     isProcessing,
     processingStep,
     html,
-    notes,
     setHtml,
     generateTemplate
   } = useTemplateGeneration();
@@ -71,9 +72,15 @@ const Index = () => {
     toast.success('Template saved successfully');
   };
 
-  const handleOpenTemplate = (templateHtml: string) => {
-    console.log('Index: Opening template in editor');
-    setHtml(templateHtml);
+  const handleOpenTemplate = (template: Template) => {
+    console.log('Index: Opening template in editor:', {
+      htmlLength: template.html.length,
+      notesLength: template.notes?.length
+    });
+    setHtml(template.html);
+    if (template.notes) {
+      setNotes(template.notes);
+    }
     setShowEditor(true);
   };
 

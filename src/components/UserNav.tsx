@@ -21,9 +21,10 @@ import { useState } from "react"
 import { AuthForm } from "./AuthForm"
 import PromptEditor from "./PromptEditor"
 import SavedTemplates from "./SavedTemplates"
+import { Template } from '@/utils/indexDB'
 
 interface UserNavProps {
-  onOpenTemplate?: (html: string) => void;
+  onOpenTemplate?: (template: Template) => void;
 }
 
 export function UserNav({ onOpenTemplate }: UserNavProps) {
@@ -33,9 +34,12 @@ export function UserNav({ onOpenTemplate }: UserNavProps) {
   const [showSavedTemplates, setShowSavedTemplates] = useState(false)
   const isAdmin = user?.email === 'vikashshingh@gmail.com'
 
-  const handleOpenTemplate = (html: string) => {
-    console.log('UserNav: Opening template with length:', html.length);
-    onOpenTemplate?.(html);
+  const handleOpenTemplate = (template: Template) => {
+    console.log('UserNav: Opening template:', {
+      htmlLength: template.html.length,
+      notesLength: template.notes?.length
+    });
+    onOpenTemplate?.(template);
     setShowSavedTemplates(false);
   };
 

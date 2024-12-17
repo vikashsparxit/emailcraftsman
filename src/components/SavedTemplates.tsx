@@ -1,12 +1,12 @@
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { getLatestTemplate } from '@/utils/indexDB';
+import { getLatestTemplate, Template } from '@/utils/indexDB';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Edit2 } from 'lucide-react';
 
 interface SavedTemplatesProps {
-  onOpenInEditor?: (html: string) => void;
+  onOpenInEditor?: (template: Template) => void;
 }
 
 const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
@@ -20,10 +20,13 @@ const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
     }
   });
 
-  const handleOpenInEditor = (html: string) => {
-    console.log('Opening template in editor:', html.substring(0, 100) + '...');
+  const handleOpenInEditor = (template: Template) => {
+    console.log('Opening template in editor:', {
+      htmlLength: template.html.length,
+      notesLength: template.notes?.length
+    });
     if (onOpenInEditor) {
-      onOpenInEditor(html);
+      onOpenInEditor(template);
     } else {
       console.error('onOpenInEditor callback is not defined');
     }
@@ -76,7 +79,7 @@ const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
               </div>
               <div className="mt-4">
                 <Button
-                  onClick={() => handleOpenInEditor(template.html)}
+                  onClick={() => handleOpenInEditor(template)}
                   className="flex items-center gap-2"
                 >
                   <Edit2 className="w-4 h-4" />
