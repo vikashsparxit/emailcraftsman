@@ -22,12 +22,21 @@ import { AuthForm } from "./AuthForm"
 import PromptEditor from "./PromptEditor"
 import SavedTemplates from "./SavedTemplates"
 
-export function UserNav() {
+interface UserNavProps {
+  onOpenTemplate?: (html: string) => void;
+}
+
+export function UserNav({ onOpenTemplate }: UserNavProps) {
   const { user, logout } = useAuth()
   const [showAuthForm, setShowAuthForm] = useState(false)
   const [showPromptEditor, setShowPromptEditor] = useState(false)
   const [showSavedTemplates, setShowSavedTemplates] = useState(false)
   const isAdmin = user?.email === 'vikashshingh@gmail.com'
+
+  const handleOpenTemplate = (html: string) => {
+    onOpenTemplate?.(html);
+    setShowSavedTemplates(false);
+  };
 
   if (!user) {
     return (
@@ -97,7 +106,7 @@ export function UserNav() {
           <DialogHeader>
             <DialogTitle>Saved Templates</DialogTitle>
           </DialogHeader>
-          <SavedTemplates />
+          <SavedTemplates onOpenInEditor={handleOpenTemplate} />
         </DialogContent>
       </Dialog>
 

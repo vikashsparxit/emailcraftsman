@@ -17,6 +17,15 @@ interface NotesPanelProps {
 const NotesPanel = ({ notes }: NotesPanelProps) => {
   const [open, setOpen] = useState(false);
 
+  // Filter out the unwanted messages
+  const filteredNotes = notes
+    .split('\n')
+    .filter(line => 
+      !line.includes("boilerplate code") && 
+      !line.includes("Let me know if you need")
+    )
+    .join('\n');
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
@@ -34,7 +43,7 @@ const NotesPanel = ({ notes }: NotesPanelProps) => {
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-8rem)] mt-4 pr-4">
           <div className="space-y-4 text-sm">
-            {notes.split('\n').map((line, index) => (
+            {filteredNotes.split('\n').map((line, index) => (
               <p key={index}>{line}</p>
             ))}
           </div>

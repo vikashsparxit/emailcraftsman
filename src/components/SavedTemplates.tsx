@@ -1,10 +1,15 @@
 import React from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { getLatestTemplate } from '@/utils/indexDB';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Edit2 } from 'lucide-react';
 
-const SavedTemplates = () => {
+interface SavedTemplatesProps {
+  onOpenInEditor?: (html: string) => void;
+}
+
+const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
   const { data: templates, isLoading, error } = useQuery({
     queryKey: ['templates'],
     queryFn: async () => {
@@ -59,6 +64,15 @@ const SavedTemplates = () => {
                 <div className="text-gray-600 dark:text-gray-400 line-clamp-3">
                   {template.html.substring(0, 150)}...
                 </div>
+              </div>
+              <div className="mt-4">
+                <Button
+                  onClick={() => onOpenInEditor?.(template.html)}
+                  className="flex items-center gap-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Open in Editor
+                </Button>
               </div>
             </div>
           ))}
