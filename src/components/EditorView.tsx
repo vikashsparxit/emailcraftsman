@@ -3,9 +3,16 @@ import TemplateEditor from './TemplateEditor';
 import AutoSave from './AutoSave';
 import NotesPanel from './NotesPanel';
 import { Button } from './ui/button';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface EditorViewProps {
   html: string;
@@ -56,7 +63,29 @@ const EditorView = ({
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            {notes && <NotesPanel notes={notes} />}
+            {notes && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-100 hover:bg-gray-800"
+                  >
+                    <FileText className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Template Notes</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4 space-y-4">
+                    {notes.split('\n').map((line, index) => (
+                      <p key={index} className="text-sm">{line}</p>
+                    ))}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
           
           <div className="flex items-center gap-4">
