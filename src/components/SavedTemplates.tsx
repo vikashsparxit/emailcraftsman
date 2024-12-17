@@ -6,10 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2, Edit2 } from 'lucide-react';
 
 interface SavedTemplatesProps {
-  onOpenInEditor?: (template: Template) => void;
+  onOpenTemplate?: (template: Template) => void;
 }
 
-const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
+const SavedTemplates = ({ onOpenTemplate }: SavedTemplatesProps) => {
   const { data: templates, isLoading, error } = useQuery({
     queryKey: ['templates'],
     queryFn: async () => {
@@ -25,8 +25,8 @@ const SavedTemplates = ({ onOpenInEditor }: SavedTemplatesProps) => {
       htmlLength: template.html.length,
       notesLength: template.notes?.length
     });
-    if (onOpenInEditor) {
-      onOpenInEditor(template);
+    if (onOpenTemplate) {
+      onOpenTemplate(template);
     } else {
       console.error('onOpenInEditor callback is not defined');
     }
